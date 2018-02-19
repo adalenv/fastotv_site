@@ -180,6 +180,10 @@ listener.on('connection', function (socket) {
         }
     });
 
+    socket.on('connect', function () {
+        socket.sessionController = null;
+    });
+
     socket.on('disconnect', function () {
         if (socket.sessionController !== null) {
             socket.sessionController.unsubscribe();
