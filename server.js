@@ -151,8 +151,9 @@ SessionController.prototype.destroyRedis = function () {
 };
 
 listener.on('connection', function (socket) {
+    socket.sessionController = null;  // pre init
+
     socket.on('post_to_chat', function (data) { // receiving chat messages
-        console.log('post_to_chat');
         var channel = data.channel;
         if (socket.sessionController === null) {
             // implicit login - socket can be timed out or disconnected
@@ -166,7 +167,6 @@ listener.on('connection', function (socket) {
     });
 
     socket.on('join_chat', function (data) {
-        console.log('join_chat');
         var channel = data.channel;
         var sessionController = new SessionController(data.user);
         sessionController.subscribe(channel, socket);
@@ -174,7 +174,6 @@ listener.on('connection', function (socket) {
     });
 
     socket.on('leave_chat', function (data) {
-        console.log('leave_chat');
         var channel = data.channel;
         if (socket.sessionController !== null) {
             socket.sessionController.unsubscribe();
@@ -183,13 +182,7 @@ listener.on('connection', function (socket) {
         }
     });
 
-    socket.on('connect', function () {
-        console.log('connect');
-        socket.sessionController = null;
-    });
-
     socket.on('disconnect', function () {
-        console.log('disconnect');
         if (socket.sessionController !== null) {
             socket.sessionController.unsubscribe();
             socket.sessionController.destroyRedis();
