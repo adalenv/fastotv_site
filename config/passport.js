@@ -126,7 +126,7 @@ module.exports = function (nev, redis_connection, passport) {
 
                     // user already exists in persistent collection...
                     if (existingPersistentUser) {
-                        return done(null, req.user);
+                        return done(null, req.user, req.flash('signupMessage', 'Email: ' + email + ' is already registered.'));
                     }
                     // a new user
                     if (newTempUser) {
