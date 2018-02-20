@@ -27,7 +27,7 @@ function validateEmail(email) {
         } else if (addresses && addresses.length > 0) {
             valid = true;
         }
-    }
+    });
     return valid;
 }
 
