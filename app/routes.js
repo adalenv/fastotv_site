@@ -330,7 +330,7 @@ module.exports = function (app, passport, nev) {
         });
     });
 
-    app.get('/user_status', function (req, res) {
+    /*app.get('/user_status', function (req, res) {
         User.find({}, function (err, all_users) {
             if (err) {
                 console.error(err);
@@ -348,7 +348,7 @@ module.exports = function (app, passport, nev) {
                 users: users
             });
         });
-    });
+    });*/
 
     // ADD device
     app.post('/add_device', function (req, res) {
