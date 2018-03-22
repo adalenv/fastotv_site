@@ -1,2 +1,10 @@
-User-agent: *
-Allow: /
+User-Agent: *
+Disallow: /login
+Disallow: /signup
+
+User-Agent: Yandex
+Disallow: /login
+Disallow: /signup
+
+Host: https://fastotv.com
+Sitemap: https://fastotv.com/sitemap.xml

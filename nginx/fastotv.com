@@ -10,7 +10,25 @@ server {
 }
 
 server {
-    server_name www.fastotv.com fastotv.com;
+    listen 443 ssl;
+    server_name www.fastotv.com;
+    return 301 https://fastotv.com$request_uri;
+
+    ssl_certificate /etc/letsencrypt/live/fastotv.com/fullchain.pem; # managed by Certbot
+    ssl_certificate_key /etc/letsencrypt/live/fastotv.com/privkey.pem; # managed by Certbot
+
+    ssl_protocols TLSv1 TLSv1.1 TLSv1.2;
+    ssl_prefer_server_ciphers on;
+    ssl_ciphers "EECDH+AESGCM:EDH+AESGCM:AES256+EECDH:AES256+EDH";
+    ssl_ecdh_curve secp384r1;
+    ssl_session_cache shared:SSL:10m;
+    ssl_session_tickets off;
+    ssl_stapling on;
+    ssl_stapling_verify on;
+}
+
+server {
+    server_name fastotv.com;
     access_log /var/log/nginx/fastotv.log;
 
     listen 443 ssl;
@@ -39,7 +57,7 @@ server {
     location / {
       proxy_set_header X-Real-IP $remote_addr;
       proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-      proxy_set_header Host $http_sudo openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/nginx/ssl/nginx.key -out /etc/nginx/ssl/nginx.crthost;
+      proxy_set_header Host $http_host;
       proxy_set_header X-NginX-Proxy true;
 
       proxy_pass http://app_fastotv;
