@@ -216,7 +216,7 @@ listener.on('connection', function (socket) {
                 'message': 'Send request to build server'
             }); //
 
-            var rpc = new (require('./app/amqprpc'))(rabbit_connection);
+            var rpc = new (require('./app/modules/amqprpc'))(rabbit_connection);
             var branding_variables = '-DUSER_LOGIN=' + in_json.email + ' -DUSER_PASSWORD=' + in_json.password + ' -DUSER_DEVICE_ID=' + in_json.device_id;
             var config = in_json.config;
             if (config.hasOwnProperty("hwaccel")) {
