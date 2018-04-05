@@ -1,5 +1,4 @@
 // load all the things we need
-const dns = require('dns');
 
 var LocalStrategy = require('passport-local').Strategy;
 var FacebookStrategy = require('passport-facebook').Strategy;
@@ -11,23 +10,34 @@ var User = require('../app/models/user');
 
 // load the auth variables
 var configAuth = require('./auth'); // use this one for testing
+var KickBox = require('../app/modules/kickbox'); // use this one for testing
 
 function validateEmail(email, cb) {
+    var kickBox = new KickBox();
     var re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
     var is_valid = re.test(email);
+
     if (!is_valid) {
-        cb('Invalid email input.');
+        done('Invalid email input.');
         return;
     }
 
-    var valid = false;
     var domain = email.split('@')[1];
+
+    const dns = require('dns');
     dns.resolve(domain, 'MX', function (err, addresses) {
         if (err) {
-            cb(err);
+            done(err);
             return
-        } else if (addresses && addresses.length > 0) {
-            cb(null);
+        }
+
+        if (addresses && addresses.length > 0) {
+            kickBox.verifyEmail(email)
+                .then(function () {
+                    done(null);
+                }).catch(function (err) {
+                done(err);
+            });
             return
         }
         cb('Can\'t resolve domain.');
