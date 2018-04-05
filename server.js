@@ -80,9 +80,9 @@ app.locals.project = {
     version: public_settings_config.app_version,
     version_type: public_settings_config.app_version_type
 };
-app.locals.author = {
+app.locals.support = {
     name: 'Topilski Alexandr',
-    contact: 'support@fastogt.com'
+    contact_email: 'support@fastogt.com'
 };
 app.locals.company = {
     name: 'FastoGT',
