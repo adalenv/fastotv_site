@@ -1,98 +1,99 @@
 <!doctype html>
 <html>
 <head>
-  <%- include('head/main') %>
+    <%- include('head/main') %>
 </head>
 <body>
 <header role="banner" class="transparent light">
-  <%- include('header/main') %>
+    <%- include('header/main') %>
 </header>
 <div class="container">
-  <div class="well">
-    <h2>
-      <p style="color:red;">Note: Anonim downloads are used only for official channels, if you want to have private
-        channels you need to be registered and build your own package in profile page.
-      </p>
-    </h2>
-    <h3>
-      <p>Download <%= site.small_description %></p>
-      <p>The latest stable version:</p>
-    </h3>
-    <div class="row">
-      <div class="row">
-        <div class="col-md-12">
-          <h3>
-            <img src="images/macosx.png" alt="" title="">
-            <%= project.name %> <%= project.version %> <span class="dowm-os">For Mac OS X:</span>
-          </h3>
+    <div class="well">
+        <h2>
+            <p style="color:red;">Note: Anonim downloads are used only for official channels, if you want to have
+                private
+                channels you need to be registered and build your own package in profile page.
+            </p>
+        </h2>
+        <h3>
+            <p>Download <%= site.small_description %></p>
+            <p>The latest stable version:</p>
+        </h3>
+        <div class="row">
+            <div class="row">
+                <div class="col-md-12">
+                    <h3>
+                        <img src="images/macosx.png" alt="" title="">
+                        <%= project.name %> <%= project.version %> <span class="dowm-os">For Mac OS X:</span>
+                    </h3>
+                </div>
+            </div>
+            <!-- version -->
+            <p>
+                <a href="/downloads/macosx/<%= project.name_lowercase %>-<%= project.version %>-x86_64.dmg">
+                    64 bit Mac OS X <%= project.version %> Installer (.dmg)
+                </a>
+            </p>
+            <p>
+                <a href="/downloads/macosx/<%= project.name_lowercase %>-<%= project.version %>-x86_64.zip">
+                    Application Archive <%= project.version %> (.zip)
+                </a>
+            <p>
         </div>
-      </div>
-      <!-- version -->
-      <p>
-        <a href="/downloads/macosx/<%= project.name_lowercase %>-<%= project.version %>-x86_64.dmg">
-          64 bit Mac OS X <%= project.version %> Installer (.dmg)
-        </a>
-      </p>
-      <p>
-        <a href="/downloads/macosx/<%= project.name_lowercase %>-<%= project.version %>-x86_64.zip">
-          Application Archive <%= project.version %> (.zip)
-        </a>
-      <p>
-    </div>
 
-    <div class="row">
-      <div class="row">
-        <div class="col-md-12">
-          <h3>
-            <img src="images/windows.png" alt="" title="">
-            <%= project.name %> <%= project.version %> <span class="dowm-os">For Windows:</span>
-          </h3>
+        <div class="row">
+            <div class="row">
+                <div class="col-md-12">
+                    <h3>
+                        <img src="images/windows.png" alt="" title="">
+                        <%= project.name %> <%= project.version %> <span class="dowm-os">For Windows:</span>
+                    </h3>
+                </div>
+            </div>
+            <!-- version -->
+            <p>
+                <a href="/downloads/windows/<%= project.name_lowercase %>-<%= project.version %>-x86_64.exe">
+                    64 bit Windows <%= project.version %> Installer (.exe)
+                </a>
+            </p>
+            <p>
+                <a href="/downloads/windows/<%= project.name_lowercase %>-<%= project.version %>-x86_64.zip">
+                    64 bit Application Archive <%= project.version %> (.zip)
+                </a>
+            </p>
         </div>
-      </div>
-      <!-- version -->
-      <p>
-        <a href="/downloads/windows/<%= project.name_lowercase %>-<%= project.version %>-x86_64.exe">
-          64 bit Windows <%= project.version %> Installer (.exe)
-        </a>
-      </p>
-      <p>
-        <a href="/downloads/windows/<%= project.name_lowercase %>-<%= project.version %>-x86_64.zip">
-          64 bit Application Archive <%= project.version %> (.zip)
-        </a>
-      </p>
-    </div>
 
-    <div class="row">
-      <div class="row">
-        <div class="col-md-12">
-          <h3>
-            <img src="images/linux.png" alt="" title="">
-            <%= project.name %> <%= project.version %> <span class="dowm-os">For Linux:</span>
-          </h3>
+        <div class="row">
+            <div class="row">
+                <div class="col-md-12">
+                    <h3>
+                        <img src="images/linux.png" alt="" title="">
+                        <%= project.name %> <%= project.version %> <span class="dowm-os">For Linux:</span>
+                    </h3>
+                </div>
+            </div>
+            <!-- version -->
+            <p>
+                <a href="/downloads/linux/<%= project.name_lowercase %>-<%= project.version %>-x86_64.deb">
+                    Debian/Ubuntu <%= project.version %> Package (.deb)
+                </a>
+            </p>
+            <p>
+                <a href="/downloads/linux/<%= project.name_lowercase %>-<%= project.version %>-x86_64.rpm">
+                    Fedora/openSUSE <%= project.version %> Package (.rpm)
+                </a>
+            </p>
+            <p>
+                <a href="/downloads/linux/<%= project.name_lowercase %>-<%= project.version %>-x86_64.tar.gz">
+                    Application Archive <%= project.version %> (.tar.gz)
+                </a>
+            <p>
         </div>
-      </div>
-      <!-- version -->
-      <p>
-        <a href="/downloads/linux/<%= project.name_lowercase %>-<%= project.version %>-x86_64.deb">
-          Debian/Ubuntu <%= project.version %> Package (.deb)
-        </a>
-      </p>
-      <p>
-        <a href="/downloads/linux/<%= project.name_lowercase %>-<%= project.version %>-x86_64.rpm">
-          Fedora/openSUSE <%= project.version %> Package (.rpm)
-        </a>
-      </p>
-      <p>
-        <a href="/downloads/linux/<%= project.name_lowercase %>-<%= project.version %>-x86_64.tar.gz">
-          Application Archive <%= project.version %> (.tar.gz)
-        </a>
-      <p>
-    </div>
 
-  </div>
+    </div>
 </div>
 <footer class="footer">
-  <%- include('footer/main') %>
+    <%- include('footer/main') %>
 </footer>
 </body>
 </html>

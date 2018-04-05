@@ -12,10 +12,14 @@ var User = require('../app/models/user');
 var configAuth = require('./auth'); // use this one for testing
 var KickBox = require('../app/modules/kickbox'); // use this one for testing
 
-function validateEmail(email, cb) {
-    var kickBox = new KickBox();
+function validateEmailInput(email) {
     var re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-    var is_valid = re.test(email);
+    return re.test(email);
+}
+
+function validateEmail(email, done) {
+    var kickBox = new KickBox();
+    var is_valid = validateEmailInput(email);
 
     if (!is_valid) {
         done('Invalid email input.');
@@ -40,7 +44,7 @@ function validateEmail(email, cb) {
             });
             return
         }
-        cb('Can\'t resolve domain.');
+        done('Can\'t resolve domain.');
     });
 }
 
@@ -79,28 +83,27 @@ module.exports = function (nev, redis_connection, passport) {
             }
 
             email = email.toLowerCase(); // Use lower-case e-mails to avoid case-sensitive e-mail matching
-            validateEmail(email, function (err) {
+            var is_valid = validateEmailInput(email);
+            if (!is_valid) {
+                return done(null, false, req.flash('loginMessage', 'Invalid email ' + email + '.'));
+            }
+
+            User.findOne({'email': email}, function (err, user) {
+                // if there are any errors, return the error
                 if (err) {
-                    return done(null, false, req.flash('loginMessage', 'Invalid email ' + email + '.'));
+                    return done(err);
                 }
 
-                User.findOne({'email': email}, function (err, user) {
-                    // if there are any errors, return the error
-                    if (err) {
-                        return done(err);
-                    }
+                // if no user is found, return the message
+                if (!user) {
+                    return done(null, false, req.flash('loginMessage', 'No user found.'));
+                }
 
-                    // if no user is found, return the message
-                    if (!user) {
-                        return done(null, false, req.flash('loginMessage', 'No user found.'));
-                    }
+                if (!user.validPassword(password)) {
+                    return done(null, false, req.flash('loginMessage', 'Oops! Wrong password.'));
+                }
 
-                    if (!user.validPassword(password)) {
-                        return done(null, false, req.flash('loginMessage', 'Oops! Wrong password.'));
-                    }
-
-                    return done(null, user);
-                });
+                return done(null, user);
             });
         }));
 
