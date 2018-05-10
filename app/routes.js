@@ -5,6 +5,7 @@ var Channel = require('../app/models/channel');
 var xmltv = require('xmltv');
 var fs = require('fs');
 var path = require('path');
+const m3u = require('m3u8-reader')
 
 function deleteFolderRecursive(path) {
     if (fs.existsSync(path)) {
@@ -272,6 +273,26 @@ module.exports = function (app, passport, nev) {
                 }
             }
         });
+        res.redirect('/channels');
+    });
+
+    app.post('/add_playlist', function (req, res) {
+        if (!req.files) {
+            req.flash('statusProfileMessage', 'No files were uploaded.');
+            return;
+        }
+
+        var sampleFile = req.files.sampleFile;
+        var tmp_path = '/tmp/' + Date.now();
+        sampleFile.mv(tmp_path, function (err) {
+            if (err) {
+                req.flash('statusProfileMessage', err);
+                return;
+            }
+
+            console.log(m3u(fs.readFileSync(tmp_path, 'utf8')))
+        });
+        fs.remove(tmp_path);
         res.redirect('/channels');
     });
 

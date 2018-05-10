@@ -135,9 +135,9 @@
                         <div class="input-group">
                             <div class="col-md-4">
                                 <label class="input-group-btn">
-                    <span class="btn btn-primary btn-xs">
-                      Browse&hellip; <input type="file" name="sampleFile" style="display: none;">
-                    </span>
+                                <span class="btn btn-primary btn-xs">
+                                  Browse&hellip; <input type="file" name="sampleFile" style="display: none;">
+                                </span>
                                 </label>
                             </div>
                             <div class="col-md-4">
@@ -203,9 +203,9 @@
                         <div class="input-group">
                             <div class="col-md-4">
                                 <label class="input-group-btn">
-                    <span class="btn btn-primary btn-xs">
-                      Browse&hellip; <input type="file" name="sampleFile" style="display: none;">
-                    </span>
+                                <span class="btn btn-primary btn-xs">
+                                  Browse&hellip; <input type="file" name="sampleFile" style="display: none;">
+                                </span>
                                 </label>
                             </div>
                             <div class="col-md-4">
@@ -243,6 +243,24 @@
                 </script>
             </div>
             <button type="submit" class="btn btn-success">Add</button>
+        </form>
+        <form class="form-group row" action="/add_playlist" encType="multipart/form-data"
+              method="post">
+            <div class="input-group">
+                <div class="col-md-4">
+                    <label class="input-group-btn">
+                                <span class="btn btn-primary btn-xs">
+                                  Browse&hellip; <input type="file" name="sampleFile" style="display: none;">
+                                </span>
+                    </label>
+                </div>
+                <div class="col-md-4">
+                    <input type="text" class="form-control input-sm" readonly>
+                </div>
+                <div class="col-md-4">
+                    <button type="submit" class="btn btn-danger btn-xs" disabled>Upload Playlist</button>
+                </div>
+            </div>
         </form>
     </div>
     <!-- Apply channels FORM -->
