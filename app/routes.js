@@ -283,14 +283,16 @@ module.exports = function (app, passport, nev) {
         }
 
         var sampleFile = req.files.sampleFile;
-        var tmp_path = '/tmp/' + Date.now();
+        var tmp_path = '/tmp/' + Date.now() + '.m3u8';
         sampleFile.mv(tmp_path, function (err) {
             if (err) {
-                req.flash('statusProfileMessage', err);
+                console.error(err);
                 return;
             }
 
-            console.log(m3u(fs.readFileSync(tmp_path, 'utf8')))
+            var data = fs.readFileSync(tmp_path, 'utf8');
+            console.log(data);
+            console.log(m3u(data));
         });
         fs.remove(tmp_path);
         res.redirect('/channels');
