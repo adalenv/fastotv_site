@@ -7,15 +7,23 @@ var fs = require('fs');
 var path = require('path');
 var m3u8 = require('m3u8');
 
-function stringToObj(str) {
-    var obj = {};
-    var stringArray = str.split(' ');
-    for (var i = 0; i < stringArray.length; i++) {
-        var kvp = stringArray[i].split('=');
-        if (kvp[1]) {
-            obj[kvp[0]] = kvp[1]
+function stringToObj(input) {
+    var elements = input.split(/([^ =]+="[^"]+")/g),
+        obj = {};
+    for (ind in elements) {
+        if (elements[ind].length > 0) {
+            var part = elements[ind];
+            var ind = part.indexOf('=')
+            if (ind === -1) {
+                continue;
+            }
+
+            var key = part.substring(0, ind);
+            var value = part.substring(ind + 1);
+            obj[key] = value.replace(/^"(.*)"$/, '$1');
         }
     }
+
     return obj;
 }
 
@@ -295,9 +303,9 @@ module.exports = function (app, passport, nev) {
         }
 
         var user = req.user;
-        var sampleFile = req.files.sampleFile;
+        var playlist_file = req.files.playlist_file;
         var tmp_path = '/tmp/' + Date.now() + '.m3u8';
-        sampleFile.mv(tmp_path, function (err) {
+        playlist_file.mv(tmp_path, function (err) {
             if (err) {
                 req.flash('statusProfileMessage', err);
                 return;
@@ -324,13 +332,15 @@ module.exports = function (app, passport, nev) {
                 }
 
                 var new_channel = {url: uri, name: title, icon: icon, tags: []};
-                //console.log(item);
-                //console.log(new_channel);
                 channels.push(new_channel);
             });
             parser.on('m3u', function (m3u) {
                 user.private_pool_channels = channels;
                 user.save(function (err) {
+                    if (err) {
+                        console.error(err);
+                        return;
+                    }
                 });
             });
             var file = fs.createReadStream(tmp_path);
