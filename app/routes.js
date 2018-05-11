@@ -5,7 +5,19 @@ var Channel = require('../app/models/channel');
 var xmltv = require('xmltv');
 var fs = require('fs');
 var path = require('path');
-const m3u = require('m3u8-reader')
+var m3u8 = require('m3u8');
+
+function stringToObj(str) {
+    var obj = {};
+    var stringArray = str.split(' ');
+    for (var i = 0; i < stringArray.length; i++) {
+        var kvp = stringArray[i].split('=');
+        if (kvp[1]) {
+            obj[kvp[0]] = kvp[1]
+        }
+    }
+    return obj;
+}
 
 function deleteFolderRecursive(path) {
     if (fs.existsSync(path)) {
@@ -276,25 +288,54 @@ module.exports = function (app, passport, nev) {
         res.redirect('/channels');
     });
 
-    app.post('/add_playlist', function (req, res) {
+    app.post('/add_private_playlist', function (req, res) {
         if (!req.files) {
             req.flash('statusProfileMessage', 'No files were uploaded.');
             return;
         }
 
+        var user = req.user;
         var sampleFile = req.files.sampleFile;
         var tmp_path = '/tmp/' + Date.now() + '.m3u8';
         sampleFile.mv(tmp_path, function (err) {
             if (err) {
-                console.error(err);
+                req.flash('statusProfileMessage', err);
                 return;
             }
 
-            var data = fs.readFileSync(tmp_path, 'utf8');
-            console.log(data);
-            console.log(m3u(data));
+            var parser = m3u8.createStream();
+            var channels = user.private_pool_channels;
+            parser.on('item', function (item) {
+                var title = item.get('title');
+                var uri = item.get('uri');
+                var icon = '';
+
+                var data = item.get('data');
+                for (var i = 0; i < data.length - 1; ++i) {
+                    var index_data_logo = data[i].indexOf('tvg-logo');
+                    if (index_data_logo !== -1) {
+                        title = data[data.length - 1];
+                        var attr = stringToObj(data[i]);
+                        if (attr.hasOwnProperty('tvg-logo')) {
+                            icon = attr['tvg-logo'];
+                        }
+                        break;
+                    }
+                }
+
+                var new_channel = {url: uri, name: title, icon: icon, tags: []};
+                //console.log(item);
+                //console.log(new_channel);
+                channels.push(new_channel);
+            });
+            parser.on('m3u', function (m3u) {
+                user.private_pool_channels = channels;
+                user.save(function (err) {
+                });
+            });
+            var file = fs.createReadStream(tmp_path);
+            file.pipe(parser);
         });
-        fs.remove(tmp_path);
         res.redirect('/channels');
     });
 
