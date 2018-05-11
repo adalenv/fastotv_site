@@ -296,23 +296,16 @@ module.exports = function (app, passport, nev) {
         res.redirect('/channels');
     });
 
-    app.post('/add_private_playlist', function (req, res) {
-        if (!req.files) {
-            req.flash('statusProfileMessage', 'No files were uploaded.');
-            return;
-        }
-
-        var user = req.user;
-        var playlist_file = req.files.playlist_file;
+    var getPlaylistChannels = function (playlist_file, callback) {
+        var playlist_file = file;
         var tmp_path = '/tmp/' + Date.now() + '.m3u8';
         playlist_file.mv(tmp_path, function (err) {
             if (err) {
-                req.flash('statusProfileMessage', err);
-                return;
+                return callback(err);
             }
 
             var parser = m3u8.createStream();
-            var channels = user.private_pool_channels;
+            var channels = [];
             parser.on('item', function (item) {
                 var title = item.get('title');
                 var uri = item.get('uri');
@@ -335,22 +328,45 @@ module.exports = function (app, passport, nev) {
                 channels.push(new_channel);
             });
             parser.on('m3u', function (m3u) {
-                user.private_pool_channels = channels;
-                user.save(function (err) {
-                    if (err) {
-                        console.error(err);
-                        return;
-                    }
-                });
+                return callback(channels);
             });
             var file = fs.createReadStream(tmp_path);
             file.pipe(parser);
         });
-        res.redirect('/channels');
+    };
+
+    app.post('/add_private_playlist', function (req, res) {
+        if (!req.files) {
+            req.flash('statusProfileMessage', 'No files were uploaded.');
+            return;
+        }
+
+        var user = req.user;
+        getPlaylistChannels(req.files.playlist_file, function (channels, err) {
+            if (err) {
+                req.flash('statusProfileMessage', err);
+                return;
+            }
+
+            for (i = 0; i < channels.length; i++) {
+                var channel = channels[i];
+                user.private_pool_channels.push(channel);
+            }
+            user.save(function (err) {
+                if (err) {
+                    req.flash('statusProfileMessage', err);
+                    return;
+                }
+
+                res.redirect('/channels');
+            });
+        });
     });
 
     // APPLY channels
     app.post('/apply_channels', function (req, res) {
+        req.files.playlist_file;
+
         var user = req.user;
         var official_channels_ids = JSON.parse(req.body.apply_channels_official_ids);
         var private_channels_ids = JSON.parse(req.body.apply_channels_private_ids);
