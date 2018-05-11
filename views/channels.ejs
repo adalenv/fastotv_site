@@ -206,21 +206,21 @@
     </div>
 
     <div class="well">
-        <h2>Add channels via m3u8 file:</h2>
+        <h2>Add channels via m3u/m3u8 file:</h2>
         <form class="form-group row" action="/add_private_playlist" encType="multipart/form-data" method="post">
             <div class="input-group">
                 <div class="col-md-3">
                     <label class="input-group-btn">
-                                <span class="btn btn-primary btn-xs">
+                                <span class="btn btn-primary">
                                   Browse&hellip; <input type="file" name="playlist_file" style="display: none;">
                                 </span>
                     </label>
                 </div>
                 <div class="col-md-3">
-                    <input type="text" class="form-control input-sm" readonly>
+                    <input type="text" class="form-control" readonly>
                 </div>
                 <div class="col-md-3">
-                    <button type="submit" class="btn btn-danger btn-xs" disabled>Upload Playlist</button>
+                    <button type="submit" class="btn btn-danger" disabled>Upload Playlist</button>
                 </div>
             </div>
         </form>
