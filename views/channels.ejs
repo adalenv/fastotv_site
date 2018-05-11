@@ -127,28 +127,6 @@
                            value=<%- official_channels[i].price %> <%- official_channels[i].checked %>>
                 </td>
                 <td>
-                    <% if (user.isAdministrator()) { %>
-                    <form class="form-group row" action="/upload_official_xmltv" encType="multipart/form-data"
-                          method="post">
-                        <input style="display: none;" class="form-control" name="channel_id"
-                               value="<%= official_channels[i].id %>">
-                        <div class="input-group">
-                            <div class="col-md-4">
-                                <label class="input-group-btn">
-                                <span class="btn btn-primary btn-xs">
-                                  Browse&hellip; <input type="file" name="sampleFile" style="display: none;">
-                                </span>
-                                </label>
-                            </div>
-                            <div class="col-md-4">
-                                <input type="text" class="form-control input-sm" readonly>
-                            </div>
-                            <div class="col-md-4">
-                                <button type="submit" class="btn btn-danger btn-xs" disabled>Upload XMLTV</button>
-                            </div>
-                        </div>
-                    </form>
-                    <% } %>
                     <form class="form-inline" action="/stream_chat" method="post">
                         <input type="hidden" class="form-control" name="channel_id"
                                value="<%= official_channels[i].id %>">
@@ -196,25 +174,6 @@
                         <input type="hidden" class="form-control" name="remove_channel_id"
                                value="<%= private_channels[i].id %>">
                         <button type="submit" class="btn btn-danger btn-xs">Remove</button>
-                    </form>
-                    <form class="form-group row" action="/upload_xmltv" encType="multipart/form-data" method="post">
-                        <input style="display: none;" class="form-control" name="channel_id"
-                               value="<%= private_channels[i].id %>">
-                        <div class="input-group">
-                            <div class="col-md-4">
-                                <label class="input-group-btn">
-                                <span class="btn btn-primary btn-xs">
-                                  Browse&hellip; <input type="file" name="sampleFile" style="display: none;">
-                                </span>
-                                </label>
-                            </div>
-                            <div class="col-md-4">
-                                <input type="text" class="form-control input-sm" readonly>
-                            </div>
-                            <div class="col-md-4">
-                                <button type="submit" class="btn btn-danger btn-xs" disabled>Upload XMLTV</button>
-                            </div>
-                        </div>
                     </form>
                 </td>
             </tr>

@@ -2,7 +2,6 @@
 var User = require('../app/models/user');
 var Channel = require('../app/models/channel');
 
-var xmltv = require('xmltv');
 var fs = require('fs');
 var path = require('path');
 var m3u8 = require('m3u8');
@@ -39,6 +38,44 @@ function deleteFolderRecursive(path) {
         });
         fs.rmdirSync(path);
     }
+}
+
+function getPlaylistChannels(playlist_file, callback) {
+    var tmp_path = '/tmp/' + Date.now() + '.m3u8';
+    playlist_file.mv(tmp_path, function (err) {
+        if (err) {
+            return callback(err);
+        }
+
+        var parser = m3u8.createStream();
+        var channels = [];
+        parser.on('item', function (item) {
+            var title = item.get('title');
+            var uri = item.get('uri');
+            var icon = '';
+
+            var data = item.get('data');
+            for (var i = 0; i < data.length - 1; ++i) {
+                var index_data_logo = data[i].indexOf('tvg-logo');
+                if (index_data_logo !== -1) {
+                    title = data[data.length - 1];
+                    var attr = stringToObj(data[i]);
+                    if (attr.hasOwnProperty('tvg-logo')) {
+                        icon = attr['tvg-logo'];
+                    }
+                    break;
+                }
+            }
+
+            var new_channel = {url: uri, name: title, icon: icon, tags: []};
+            channels.push(new_channel);
+        });
+        parser.on('m3u', function (m3u) {
+            return callback(channels);
+        });
+        var file = fs.createReadStream(tmp_path);
+        file.pipe(parser);
+    });
 }
 
 function createRedisChannel(id, url, title, icon, programs) {  // ChannelInfo
@@ -204,136 +241,6 @@ module.exports = function (app, passport, nev) {
             res.redirect('/channels');
         });
     });
-
-    // UPLOAD xmltv official channel
-    app.post('/upload_official_xmltv', function (req, res) {
-        if (!req.files) {
-            req.flash('statusProfileMessage', 'No files were uploaded.');
-            return;
-        }
-
-        var sampleFile = req.files.sampleFile;
-        var channel_id = req.body.channel_id;
-        var tmp_path = '/tmp/' + channel_id;
-        sampleFile.mv(tmp_path, function (err) {
-            if (err) {
-                req.flash('statusProfileMessage', err);
-                return;
-            }
-
-            Channel.find({}, function (err, all_channels) {
-                if (err) {
-                    console.error(err);
-                    return;
-                }
-
-                var channel_id = req.body.channel_id;
-                for (var i = 0; i < all_channels.length; i++) {
-                    if (all_channels[i].equals(channel_id)) {
-                        var input = fs.createReadStream(tmp_path);
-                        var parser = new xmltv.Parser();
-                        var programmes = [];
-                        input.pipe(parser);
-                        parser.on('programme', function (programme) {
-                            programmes.push(programme);
-                        });
-                        parser.on('end', function () {
-                            all_channels[i].programmes = programmes;
-                            all_channels[i].save(function (err) {
-                                if (err) {
-                                    req.flash('statusProfileMessage', err);
-                                }
-                            });
-                        });
-                        break;
-                    }
-                }
-            });
-        });
-        res.redirect('/channels');
-    });
-
-    // UPLOAD xmltv private channel
-    app.post('/upload_xmltv', function (req, res) {
-        if (!req.files) {
-            req.flash('statusProfileMessage', 'No files were uploaded.');
-            return;
-        }
-
-        var sampleFile = req.files.sampleFile;
-        var channel_id = req.body.channel_id;
-        var tmp_path = '/tmp/' + channel_id;
-        sampleFile.mv(tmp_path, function (err) {
-            if (err) {
-                req.flash('statusProfileMessage', err);
-                return;
-            }
-
-            var user = req.user;
-            var channel_id = req.body.channel_id;
-            for (var i = 0; i < user.private_pool_channels.length; i++) {
-                if (user.private_pool_channels[i].equals(channel_id)) {
-                    var input = fs.createReadStream(tmp_path);
-                    var parser = new xmltv.Parser();
-                    var programmes = [];
-                    input.pipe(parser);
-                    parser.on('programme', function (programme) {
-                        programmes.push(programme);
-                    });
-                    parser.on('end', function () {
-                        user.private_pool_channels[i].programmes = programmes;
-                        user.save(function (err) {
-                            if (err) {
-                                req.flash('statusProfileMessage', err);
-                                return;
-                            }
-                        });
-                    });
-                    break;
-                }
-            }
-        });
-        res.redirect('/channels');
-    });
-
-    var getPlaylistChannels = function (playlist_file, callback) {
-        var playlist_file = file;
-        var tmp_path = '/tmp/' + Date.now() + '.m3u8';
-        playlist_file.mv(tmp_path, function (err) {
-            if (err) {
-                return callback(err);
-            }
-
-            var parser = m3u8.createStream();
-            var channels = [];
-            parser.on('item', function (item) {
-                var title = item.get('title');
-                var uri = item.get('uri');
-                var icon = '';
-
-                var data = item.get('data');
-                for (var i = 0; i < data.length - 1; ++i) {
-                    var index_data_logo = data[i].indexOf('tvg-logo');
-                    if (index_data_logo !== -1) {
-                        title = data[data.length - 1];
-                        var attr = stringToObj(data[i]);
-                        if (attr.hasOwnProperty('tvg-logo')) {
-                            icon = attr['tvg-logo'];
-                        }
-                        break;
-                    }
-                }
-
-                var new_channel = {url: uri, name: title, icon: icon, tags: []};
-                channels.push(new_channel);
-            });
-            parser.on('m3u', function (m3u) {
-                return callback(channels);
-            });
-            var file = fs.createReadStream(tmp_path);
-            file.pipe(parser);
-        });
-    };
 
     app.post('/add_private_playlist', function (req, res) {
         if (!req.files) {
