@@ -132,16 +132,14 @@
                                value="<%= official_channels[i].id %>">
                         <button type="submit" class="btn btn-info btn-xs">Chat room</button>
                     </form>
-                </td>
-                <% if (user.isAdministrator()) { %>
-                <td>
+                    <% if (user.isAdministrator()) { %>
                     <form action="/remove_offical_channel" method="post">
                         <input type="hidden" class="form-control" name="channel_id"
                                value="<%= official_channels[i].id %>">
                         <button type="submit" class="btn btn-danger btn-xs">Remove</button>
                     </form>
+                    <% } %>
                 </td>
-                <% } %>
             </tr>
             <% } %>
             <% } %>
