@@ -1,7 +1,7 @@
 // load up the user model
 var User = require('../app/models/user');
 var Channel = require('../app/models/channel');
-var channel_constants = require('.channel_constants');
+var channel_constants = require('../app/models/channel_constants');
 
 var fs = require('fs');
 var path = require('path');
