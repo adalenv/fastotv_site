@@ -642,6 +642,15 @@ module.exports = function (app, passport, nev) {
             res.redirect('/channels');
         });
     });
+
+    // seo 404
+    app.get('/custom_404', function (req, res) {
+        res.status(404).render('custom_404.ejs');
+    });
+
+    app.get('*', function (req, res) {
+        res.redirect('/custom_404');
+    });
 };
 
 // route middleware to ensure user is logged in
