@@ -1,12 +1,12 @@
-upstream app_fastotv {
+upstream app_http_server {
     server 127.0.0.1:8080;
 }
 
 server {
-    # Redirect non-https traffic to https
-    if ($scheme != "https") {
-         return 301 https://$host$request_uri;
-    } # managed by Certbot
+    listen 80;
+    server_name fastonosql.com;
+    access_log /var/log/nginx/fastonosql.log;
+    return 301 https://$server_name$request_uri;
 }
 
 server {
@@ -60,7 +60,7 @@ server {
       proxy_set_header Host $http_host;
       proxy_set_header X-NginX-Proxy true;
 
-      proxy_pass http://app_fastotv;
+      proxy_pass http://app_http_server;
       proxy_redirect off;
     }
 }
