@@ -1,5 +1,3 @@
-// load up the user model
-var User = require('../app/models/user');
 var Channel = require('../app/models/channel');
 var channel_constants = require('../app/models/channel_constants');
 
@@ -50,6 +48,7 @@ function getPlaylistChannels(playlist_file, callback) {
 
         var parser = m3u8.createStream();
         var channels = [];
+        var tags = [];
         parser.on('item', function (item) {
             var title = item.get('title');
             var uri = item.get('uri');
@@ -64,16 +63,25 @@ function getPlaylistChannels(playlist_file, callback) {
                     if (attr.hasOwnProperty('tvg-logo')) {
                         icon = attr['tvg-logo'];
                     }
+                    if (attr.hasOwnProperty('group-title')) {
+                        tags.push(attr['group-title']);
+                    }
+                    if (attr.hasOwnProperty('tvg-language')) {
+                        tags.push(attr['tvg-language']);
+                    }
+                    if (attr.hasOwnProperty('tvg-country')) {
+                        tags.push(attr['tvg-country']);
+                    }
                     break;
                 }
             }
-
-            var new_channel = {url: uri, name: title, icon: icon, tags: []};
+            var new_channel = {url: uri, name: title, icon: icon, tags: tags};
             channels.push(new_channel);
         });
         parser.on('m3u', function (m3u) {
             return callback(channels);
         });
+
         var file = fs.createReadStream(tmp_path);
         file.pipe(parser);
     });
@@ -170,23 +178,23 @@ module.exports = function (app, passport, nev) {
             var private_pool_channels = user.private_pool_channels;
             var private_channels = [];
             for (i = 0; i < private_pool_channels.length; i++) {
-                var channel = private_pool_channels[i];
-                var exist = false;
+                var private_channel = private_pool_channels[i];
+                var selected = false;
                 for (var j = 0; j < user_private_channels.length; j++) {
-                    if (user_private_channels[j].equals(channel._id)) {
-                        exist = true;
+                    if (user_private_channels[j].equals(private_channel._id)) {
+                        selected = true;
                         break;
                     }
                 }
                 private_channels.push(
                     {
-                        id: channel._id,
-                        tags: channel.tags,
-                        name: channel.name,
-                        url: channel.url,
-                        price: channel.price,
-                        icon: channel.icon,
-                        checked: exist ? "checked" : ""
+                        id: private_channel._id,
+                        tags: private_channel.tags,
+                        name: private_channel.name,
+                        url: private_channel.url,
+                        price: private_channel.price,
+                        icon: private_channel.icon,
+                        checked: selected ? "checked" : ""
                     });
             }
 
@@ -465,8 +473,6 @@ module.exports = function (app, passport, nev) {
 
     app.get('/devices', function (req, res) {
         var user = req.user;
-        var login = req.body.login;
-
         res.render('devices.ejs', {
             devices: user.devices
         });
