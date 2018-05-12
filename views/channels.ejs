@@ -57,31 +57,31 @@
             var total = $('#total');
             var official_ids = $('#official_ids');
             var sum = 0;
-            var selecetd_official_id = [];
+            var selected_official_id = [];
             for (var i = 0; i < arr.length; i++) {
                 var checkbox = arr[i];
                 if (checkbox.checked) {
                     sum += parseFloat(checkbox.value);
                     var cid = checkbox.getAttribute('channel_id');
-                    selecetd_official_id.push(cid);
+                    selected_official_id.push(cid);
                 }
             }
             total.value = sum;
-            official_ids.val(JSON.stringify(selecetd_official_id));
+            official_ids.val(JSON.stringify(selected_official_id));
         }
 
         function on_private_list_update() {
             var arr = $('[name=private_channel]');
             var private_ids = $('#private_ids');
-            var selecetd_private_id = [];
+            var selected_private_id = [];
             for (var i = 0; i < arr.length; i++) {
                 var checkbox = arr[i];
                 if (checkbox.checked) {
                     var cid = checkbox.getAttribute('channel_id');
-                    selecetd_private_id.push(cid);
+                    selected_private_id.push(cid);
                 }
             }
-            private_ids.val(JSON.stringify(selecetd_private_id));
+            private_ids.val(JSON.stringify(selected_private_id));
         }
 
         function on_load() {
@@ -96,7 +96,7 @@
 <div class="container">
     <div class="well">
         <a href="/profile" class="btn btn-warning btn-md pull-right"><span class="fa fa-sign-out"/>Profile</a>
-        <h2>Availible channels:</h2>
+        <h2>Available official channels:</h2>
         <table class="table">
             <thead>
             <tr>
@@ -172,7 +172,7 @@
 
     <% if (user.isAdministrator()) { %>
     <div class="well">
-        <h2>Add channels via m3u/m3u8 file:</h2>
+        <h2>Add official channels via m3u/m3u8 file:</h2>
         <form class="form-group row" action="/add_offical_playlist" encType="multipart/form-data" method="post">
             <div class="input-group">
                 <div class="col-md-3">
@@ -194,7 +194,7 @@
     <% } %>
 
     <div class="well">
-        <h2>Availible user channels:</h2>
+        <h2>Available user channels:</h2>
         <table class="table">
             <thead>
             <tr>
@@ -259,7 +259,7 @@
     </div>
 
     <div class="well">
-        <h2>Add channels via m3u/m3u8 file:</h2>
+        <h2>Add private channels via m3u/m3u8 file:</h2>
         <form class="form-group row" action="/add_private_playlist" encType="multipart/form-data" method="post">
             <div class="input-group">
                 <div class="col-md-3">
