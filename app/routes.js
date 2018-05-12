@@ -48,8 +48,8 @@ function getPlaylistChannels(playlist_file, callback) {
 
         var parser = m3u8.createStream();
         var channels = [];
-        var tags = [];
         parser.on('item', function (item) {
+            var tags = [];
             var title = item.get('title');
             var uri = item.get('uri');
             var icon = channel_constants.DEFAULT_ICON_PATH;
