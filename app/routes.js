@@ -1,6 +1,7 @@
 // load up the user model
 var User = require('../app/models/user');
 var Channel = require('../app/models/channel');
+var channel_constants = require('.channel_constants');
 
 var fs = require('fs');
 var path = require('path');
@@ -52,7 +53,7 @@ function getPlaylistChannels(playlist_file, callback) {
         parser.on('item', function (item) {
             var title = item.get('title');
             var uri = item.get('uri');
-            var icon = '';
+            var icon = channel_constants.DEFAULT_ICON_PATH;
 
             var data = item.get('data');
             for (var i = 0; i < data.length - 1; ++i) {
@@ -81,6 +82,18 @@ function getPlaylistChannels(playlist_file, callback) {
 function createRedisChannel(id, url, title, icon, programs) {  // ChannelInfo
     var epg = {id: id, url: url, display_name: title, icon: icon, programs: programs}; // EpgInfo
     return {epg: epg, video: true, audio: true}
+}
+
+function parseChannelBody(body) {
+    var name = body.name;
+    var url = body.url;
+    var tags_array = body.tags.split(',');
+    var tags = [];
+    for (var i in tags_array) {
+        tags.push(tags_array[i]);
+    }
+
+    return {url: url, name: name, tags: tags};
 }
 
 module.exports = function (app, passport, nev) {
@@ -208,15 +221,7 @@ module.exports = function (app, passport, nev) {
     // ADD private channel
     app.post('/add_private_channel', function (req, res) {
         var user = req.user;
-        var name = req.body.name;
-        var url = req.body.url;
-        var tags_array = req.body.tags.split(',');
-        console.log(req.body);
-        var tags = [];
-        for (var i in tags_array) {
-            tags.push(tags_array[i]);
-        }
-        var new_channel = {url: url, name: name, tags: tags}
+        var new_channel = parseChannelBody(req.body);
         user.private_pool_channels.push(new_channel);
         user.save(function (err) {
             if (err) {
@@ -228,72 +233,7 @@ module.exports = function (app, passport, nev) {
         });
     });
 
-    // REMOVE private channel
-    app.post('/remove_private_channel', function (req, res) {
-        var user = req.user;
-        var channel_id = req.body.channel_id;
-        user.private_pool_channels.pull({_id: channel_id});
-        user.save(function (err) {
-            if (err) {
-                req.flash('statusProfileMessage', err);
-                return;
-            }
-
-            res.redirect('/channels');
-        });
-    });
-
-    // ADD offical channel
-    app.post('/add_offical_channel', function (req, res) {
-        var user = req.user;
-        var name = req.body.name;
-        var url = req.body.url;
-        var tags_array = req.body.tags.split(',');
-        console.log(req.body);
-        var tags = [];
-        for (var i in tags_array) {
-            tags.push(tags_array[i]);
-        }
-        var chan = new Channel({url : url, name: name, tags: tags});
-        chan.save(function (err) {
-            if (err) {
-                req.flash('statusProfileMessage', err);
-                return;
-            }
-
-            res.redirect('/channels');
-        });
-    });
-
-
-    app.post('/add_offical_playlist', function (req, res) {
-    	if (!req.files) {
-        	req.flash('statusProfileMessage', 'No files were uploaded.');
-       		return;
-    	}
-
-    	Channel.find({}, function (err, channels) {
-        	if (err) {
-            		req.flash('statusProfileMessage', err);
-            		return;
-        	}
-
-        	getPlaylistChannels(req.files.playlist_file, function (channels, err) {
-            		if (err) {
-                		req.flash('statusProfileMessage', err);
-                		return;
-            		}
-
-            		for (i = 0; i < channels.length; i++) {
-	              		var channel = channels[i];
-        	      		var chan = new Channel({url : channel.url, name: channel.name, icon: channel.icon, tags: channel.tags});
-              			chan.save(function (err, res){if (err) {console.log(err);}});
-            		}
-        	});
-    	});
-    	res.redirect('/channels');
-    });
-
+    // ADD private channels
     app.post('/add_private_playlist', function (req, res) {
         if (!req.files) {
             req.flash('statusProfileMessage', 'No files were uploaded.');
@@ -322,11 +262,78 @@ module.exports = function (app, passport, nev) {
         });
     });
 
+    // REMOVE private channel
+    app.post('/remove_private_channel', function (req, res) {
+        var user = req.user;
+        var channel_id = req.body.channel_id;
+        user.private_pool_channels.pull({_id: channel_id});
+        user.save(function (err) {
+            if (err) {
+                req.flash('statusProfileMessage', err);
+                return;
+            }
+
+            res.redirect('/channels');
+        });
+    });
+
+    // ADD offical channel
+    app.post('/add_offical_channel', function (req, res) {
+        var new_channel = parseChannelBody(req.body);
+        var chan = new Channel(new_channel);
+        chan.save(function (err) {
+            if (err) {
+                req.flash('statusProfileMessage', err);
+                return;
+            }
+
+            res.redirect('/channels');
+        });
+    });
+
+    // ADD offical channels
+    app.post('/add_offical_playlist', function (req, res) {
+        if (!req.files) {
+            req.flash('statusProfileMessage', 'No files were uploaded.');
+            return;
+        }
+
+        Channel.find({}, function (err, channels) {
+            if (err) {
+                req.flash('statusProfileMessage', err);
+                return;
+            }
+
+            getPlaylistChannels(req.files.playlist_file, function (channels, err) {
+                if (err) {
+                    req.flash('statusProfileMessage', err);
+                    return;
+                }
+
+                for (i = 0; i < channels.length; i++) {
+                    var channel = channels[i];
+                    var chan = new Channel({
+                        url: channel.url,
+                        name: channel.name,
+                        icon: channel.icon,
+                        tags: channel.tags
+                    });
+                    chan.save(function (err, res) {
+                        if (err) {
+                            console.error(err);
+                        }
+                    });
+                }
+            });
+        });
+        res.redirect('/channels');
+    });
+
     // REMOVE offical channel
     app.post('/remove_offical_channel', function (req, res) {
         var user = req.user;
         var channel_id = req.body.channel_id;
-        Channel.remove({ _id: channel_id }, function(err) {
+        Channel.remove({_id: channel_id}, function (err) {
             if (err) {
                 req.flash('statusProfileMessage', err);
                 return;

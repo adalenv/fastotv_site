@@ -148,7 +148,7 @@
             </tbody>
         </table>
         <% if (user.isAdministrator()) { %>
-	<form class="form-inline" action="/add_offical_channel" method="post">
+        <form class="form-inline" action="/add_offical_channel" method="post">
             <div class="form-group">
                 <input class="form-control" name="name" placeholder="Name">
             </div>
@@ -160,7 +160,7 @@
                 <script>
                     $('#tags_id').tagsinput({
                         typeahead: {
-                            source: function (query) { 
+                            source: function (query) {
                                 return $.getJSON('assets/channels_tags.json');
                             }
                         }
@@ -171,7 +171,7 @@
         </form>
         <% } %>
     </div>
-    
+
     <% if (user.isAdministrator()) { %>
     <div class="well">
         <h2>Add channels via m3u/m3u8 file:</h2>
