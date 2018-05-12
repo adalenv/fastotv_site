@@ -1,7 +1,7 @@
 // load the things we need
 var mongoose = require('mongoose');
 var ProgrammeSchema = require('./programme');
-var channel_constants = require('.channel_constants');
+var channel_constants = require('./channel_constants');
 // define the schema for our channel model
 var ChannelSchema = mongoose.Schema({
     url: String,
