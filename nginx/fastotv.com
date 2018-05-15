@@ -4,8 +4,8 @@ upstream app_http_server {
 
 server {
     listen 80;
-    server_name fastonosql.com;
-    access_log /var/log/nginx/fastonosql.log;
+    server_name fastotv.com;
+    access_log /var/log/nginx/fastotv.log;
     return 301 https://$server_name$request_uri;
 }
 
