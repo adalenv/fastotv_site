@@ -87,8 +87,8 @@ app.locals.support = {
 app.locals.company = {
     name: 'FastoGT',
     description: 'Fasto Great Technology',
-    domain: 'http://fastogt.com',
-    copyright: 'Copyright © 2014-2017 FastoGT. All rights reserved.'
+    domain: 'https://fastogt.com',
+    copyright: 'Copyright © 2014-2019 <a>href="https://fastogt.com">FastoGT</a>. All rights reserved.'
 };
 
 app.locals.back_end = {
